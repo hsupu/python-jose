@@ -1,6 +1,16 @@
 python-jose
 ===========
 
+DIFFERENCES FROM ORIGINAL
+-------------------------
+
+- Raise ``JWTClaimMissingError`` when claim is missing but ``require_claim=True``
+- Don't set ``verify_claim=True`` when ``require_claim=True``
+- set ``verify_claim=False`` when claim is missing
+
+ORIGINAL OPENING
+----------------
+
 A JOSE implementation in Python
 
 |pypi| |Github Actions CI Status| |Coverage Status| |Docs| |style|

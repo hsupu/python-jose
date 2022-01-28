@@ -22,6 +22,18 @@ class JWTClaimsError(JWTError):
     pass
 
 
+class JWTClaimMissingError(JWTError):
+    """
+    Required claim is missing
+    """
+
+    claim: str
+
+    def __init__(self, claim: str, *args: object) -> None:
+        super().__init__(*args)
+        self.claim = claim
+
+
 class ExpiredSignatureError(JWTError):
     pass
 

@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from jose import jws
 
 from .constants import ALGORITHMS
-from .exceptions import ExpiredSignatureError, JWSError, JWTClaimsError, JWTError
+from .exceptions import ExpiredSignatureError, JWSError, JWTClaimsError, JWTClaimMissingError, JWTError
 from .utils import calculate_at_hash, timedelta_total_seconds
 
 
@@ -461,12 +461,17 @@ def _validate_claims(claims, audience=None, issuer=None, subject=None, algorithm
 
     if isinstance(leeway, timedelta):
         leeway = timedelta_total_seconds(leeway)
+
     required_claims = [e[len("require_") :] for e in options.keys() if e.startswith("require_") and options[e]]
     for require_claim in required_claims:
         if require_claim not in claims:
-            raise JWTError('missing required key "%s" among claims' % require_claim)
-        else:
-            options["verify_" + require_claim] = True  # override verify when required
+            raise JWTClaimMissingError(require_claim, 'missing required key "%s" among claims' % require_claim)
+
+    verify_claims = [e[len("verify_") :] for e in options.keys() if e.startswith("verify_") and options[e]]
+    for claim in verify_claims:
+        if claim not in claims:
+            # no verify when missing
+            options["verify_" + claim] = False
 
     if not isinstance(audience, ((str,), type(None))):
         raise JWTError("audience must be a string or None")
